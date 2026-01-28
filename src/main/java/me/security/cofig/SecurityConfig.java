@@ -8,6 +8,7 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,7 +25,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+                // we use this when we use the jwt authentication and do not use cookie authentication
+                // then use this csrf disable
+                // another reason is that stateless .sessionManagement()
+                //.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                // then csrf has no meaning over this
+                // when to use csrf form login session cookies...
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth.requestMatchers("/authenticate").permitAll()
+                        .anyRequest().authenticated())
                 .httpBasic(withDefaults());
         return http.build();
     }
@@ -42,9 +51,8 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder){
-
         // in authentication manager we have to register our custom userdetails service
-        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider(userDetailsService);
+        DaoAuthenticationProvider daoAuthenticationProvider =    new DaoAuthenticationProvider(userDetailsService);
 
         // dao authentication service mein hum apna customn class patak rahe hai taaki wo authenticate kr ske
         // we have craeted custom dao authentication provider
