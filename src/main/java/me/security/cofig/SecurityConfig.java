@@ -1,10 +1,13 @@
 package me.security.cofig;
 
 import me.security.filter.JWTAuthFilter;
+import me.security.model.enums.Permission;
+import me.security.model.enums.Roles;
 import me.security.service.CustomeUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -39,7 +42,11 @@ public class SecurityConfig {
                 // when to use csrf form login session cookies...
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth.requestMatchers("/authenticate")
-                        .permitAll().anyRequest().authenticated())
+                        .permitAll()
+                        .requestMatchers("/abc").hasRole(Roles.ADMIN.name())
+                        .requestMatchers(HttpMethod.GET, "/**").hasAuthority(Permission.READ.name())
+                        .requestMatchers(HttpMethod.POST, "/**").hasAuthority(Permission.WRITE.name())
+                        .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
 //                .httpBasic(withDefaults()); // this will remove the default username password authentication authentication

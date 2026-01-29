@@ -18,6 +18,11 @@ public class BookingController {
         return "Healthy";
     }
 
+    @GetMapping("/abc")
+    private String hhhh(){
+        return "Hellu from role";
+    }
+
     @GetMapping("/getAllBookings")
     public ResponseEntity<?> getAllBookings(){
         return new ResponseEntity<>(bookingService.getAllBookings(), HttpStatusCode.valueOf(200));

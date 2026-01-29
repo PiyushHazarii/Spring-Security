@@ -1,5 +1,6 @@
-package me.security.model.entity;
+package me.security.repository;
 
+import me.security.model.entity.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

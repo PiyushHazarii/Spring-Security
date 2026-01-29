@@ -2,12 +2,17 @@ package me.security.model.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import me.security.model.enums.Permission;
+import me.security.model.enums.Roles;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Data
@@ -21,11 +26,17 @@ public class Users implements UserDetails {
 
     private String username;
     private String password;
-    private String role;
+
+    @Enumerated(EnumType.STRING)
+    private Roles role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role));
+        Set<SimpleGrantedAuthority> authorities = new HashSet<>();
+        authorities.add(new SimpleGrantedAuthority("ROLE_"+role.name()));
+        authorities.addAll(role.getPermissions().stream().map(permission->
+                new SimpleGrantedAuthority(permission.name())).collect(Collectors.toSet()));
+        return authorities;
     }
 
     @Override

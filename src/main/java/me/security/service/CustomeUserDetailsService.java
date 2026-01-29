@@ -3,7 +3,7 @@ package me.security.service;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import me.security.model.entity.Users;
-import me.security.model.entity.UsersRepository;
+import me.security.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
