@@ -1,6 +1,8 @@
 package me.security.cofig;
 
+import me.security.filter.JWTAuthFilter;
 import me.security.service.CustomeUserDetailsService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -21,6 +24,9 @@ import static org.springframework.security.config.Customizer.withDefaults;
 // and we are going to enable the wensecurity config inside this class
 //it turns on Spring Security for web requests and prepare the security filter system
 public class SecurityConfig {
+
+    @Autowired
+    private JWTAuthFilter jwtAuthFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -32,9 +38,11 @@ public class SecurityConfig {
                 // then csrf has no meaning over this
                 // when to use csrf form login session cookies...
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth.requestMatchers("/authenticate").permitAll()
-                        .anyRequest().authenticated())
-                .httpBasic(withDefaults());
+                .authorizeHttpRequests(auth -> auth.requestMatchers("/authenticate")
+                        .permitAll().anyRequest().authenticated())
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
+//                .httpBasic(withDefaults()); // this will remove the default username password authentication authentication
         return http.build();
     }
 
